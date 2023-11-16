@@ -144,7 +144,7 @@ if __name__ == "__main__":
     string2 = "موسسة"
      
     weighted_distance = weighted_edit_distance(string1, string2)
-    
     normalized_weighted_distance = weighted_distance/len(string2)
+    
     print("Weighted edit distance:", weighted_distance)
     print ("Normalized weighted edit distance:", normalized_weighted_distance)
