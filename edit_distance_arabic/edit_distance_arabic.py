@@ -106,7 +106,7 @@ def weighted_edit_distance(
         string2 (str): The second string.
         insertion_cost (int): The cost of inserting a character.
         deletion_cost (int): The cost of deleting a character.
-        list_dict_freq_costs (list): list of tuples: dictionary and cost.
+        list_dict_freq_costs (list): list of tuples (dictionary, cost).
 
     Returns:
         int: The weighted edit distance between the two strings.
