@@ -4,6 +4,7 @@ This code calculates the weighted edit distance between two strings.
 
 import numpy as np
 
+
 COST_FREQ1 = 0.1
 DICT_LETTER_SWAP_FREQ1 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ1 (0.1)
     'ه':'ة', 
@@ -64,19 +65,39 @@ DICT_LETTER_SWAP_FREQ2 = { # Dictionary of letter pairs with a substitution cost
 
 }
 
-def weighted_letter_swap(letter_1, letter_2):
-    cost = 1
-    if letter_1 in DICT_LETTER_SWAP_FREQ1 and DICT_LETTER_SWAP_FREQ1[letter_1]==letter_2:
-        cost = COST_FREQ1
-    elif letter_2 in DICT_LETTER_SWAP_FREQ1 and DICT_LETTER_SWAP_FREQ1[letter_2]==letter_1:
-        cost = COST_FREQ1   
-    elif letter_1 in DICT_LETTER_SWAP_FREQ2 and DICT_LETTER_SWAP_FREQ2[letter_1]==letter_2:
-        cost = COST_FREQ2
-    elif letter_2 in DICT_LETTER_SWAP_FREQ2 and DICT_LETTER_SWAP_FREQ2[letter_2]==letter_1:
-        cost = COST_FREQ2
+LIST_DICT_LETTER_SWAP_BY_FREQ = [
+    (DICT_LETTER_SWAP_FREQ1, COST_FREQ1),
+    (DICT_LETTER_SWAP_FREQ2, COST_FREQ2)
+]
+
+
+def weighted_letter_swap(
+        letter_1, letter_2, def_substitution_cost,
+        list_dict_freq_costs=LIST_DICT_LETTER_SWAP_BY_FREQ):
+    """
+    Determines the cost of substituting one letter for another based on their frequency of substitution.
+
+    Args:
+        letter_1 (str): The first letter.
+        letter_2 (str): The second letter.
+        def_substitution_cost (float): the default substitution cost if not in the dictionaries.
+        list_dict_freq_costs (list): list of tuples: dictionary and cost.
+
+    Returns:
+        int: The cost of substituting letter_1 for letter_2.
+    """
+    cost = def_substitution_cost
+    for dict_letter_swap, cost in list_dict_freq_costs:
+        if letter_1 in dict_letter_swap and dict_letter_swap[letter_1]==letter_2:
+            cost = cost
+            break
+        if letter_2 in dict_letter_swap and dict_letter_swap[letter_2]==letter_1:
+            cost = cost
+            break 
     return cost
 
-def weighted_edit_distance(string1, string2, insertion_cost=1, deletion_cost=1):
+def weighted_edit_distance(
+        string1, string2, insertion_cost=1, deletion_cost=2, def_substitution_cost=1):
     """
     Calculates the weighted edit distance between two strings.
 
@@ -107,7 +128,8 @@ def weighted_edit_distance(string1, string2, insertion_cost=1, deletion_cost=1):
             if string1[i - 1] == string2[j - 1]:
                 substitution_cost = 0
             else:
-                substitution_cost = weighted_letter_swap(string1[i - 1], string2[j - 1])          
+                substitution_cost = weighted_letter_swap(
+                    string1[i - 1], string2[j - 1], def_substitution_cost)          
 
             d[i, j] = min(d[i - 1, j] + deletion_cost,
                           d[i, j - 1] + insertion_cost,
@@ -117,8 +139,8 @@ def weighted_edit_distance(string1, string2, insertion_cost=1, deletion_cost=1):
 
 
 if __name__ == "__main__":
-    string1 = "هنية"
-    string2 = "هنيه"
+    string1 = "مؤسسة"
+    string2 = "موسسة"
      
     weighted_distance = weighted_edit_distance(string1, string2)
     
