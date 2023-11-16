@@ -96,7 +96,7 @@ def weighted_letter_swap(
     return cost
 
 def weighted_edit_distance(
-        string1, string2, insertion_cost=1, deletion_cost=2, def_substitution_cost=1, 
+        string1, string2, insertion_cost=1, deletion_cost=1, def_substitution_cost=1, 
         list_dict_freq_costs=LIST_DICT_LETTER_SWAP_BY_FREQ):
     """
     Calculates the weighted edit distance between two strings.
