@@ -72,8 +72,7 @@ LIST_DICT_LETTER_SWAP_BY_FREQ = [
 
 
 def weighted_letter_swap(
-        letter_1, letter_2, def_substitution_cost,
-        list_dict_freq_costs=LIST_DICT_LETTER_SWAP_BY_FREQ):
+        letter_1, letter_2, def_substitution_cost, list_dict_freq_costs):
     """
     Determines the cost of substituting one letter for another based on their frequency of substitution.
 
@@ -97,7 +96,8 @@ def weighted_letter_swap(
     return cost
 
 def weighted_edit_distance(
-        string1, string2, insertion_cost=1, deletion_cost=2, def_substitution_cost=1):
+        string1, string2, insertion_cost=1, deletion_cost=2, def_substitution_cost=1, 
+        list_dict_freq_costs=LIST_DICT_LETTER_SWAP_BY_FREQ):
     """
     Calculates the weighted edit distance between two strings.
 
@@ -106,6 +106,7 @@ def weighted_edit_distance(
         string2 (str): The second string.
         insertion_cost (int): The cost of inserting a character.
         deletion_cost (int): The cost of deleting a character.
+        list_dict_freq_costs (list): list of tuples: dictionary and cost.
 
     Returns:
         int: The weighted edit distance between the two strings.
@@ -129,7 +130,7 @@ def weighted_edit_distance(
                 substitution_cost = 0
             else:
                 substitution_cost = weighted_letter_swap(
-                    string1[i - 1], string2[j - 1], def_substitution_cost)          
+                    string1[i - 1], string2[j - 1], def_substitution_cost, list_dict_freq_costs)          
 
             d[i, j] = min(d[i - 1, j] + deletion_cost,
                           d[i, j - 1] + insertion_cost,
