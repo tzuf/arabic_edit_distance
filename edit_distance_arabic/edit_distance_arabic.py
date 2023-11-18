@@ -7,60 +7,29 @@ import numpy as np
 
 COST_FREQ1 = 0.1
 DICT_LETTER_SWAP_FREQ1 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ1 (0.1)
-    'ه':'ة', 
-    'ة': 'ه',
-    'ا':'ه',
-    'ه':'ا',
-    'ؤ':'و',
-    'و' :'ؤ',
-    'أ' :'ا', 
-    'أ' :'إ', 
-    'أ' :'ئ', 
-    'أ' :'ؤ', 
-    'أ' :'ء', 
-    'إ':'ا',
-    'إ':'أ',
-    'إ':'ئ',
-    'إ':'ؤ',
-    'إ':'ء',
-    'ؤ':'ئ',
-    'ؤ':'ء',
-    'ئ':'ؤ',
-    'ئ':'ء',
-    'ئ':'ء',
-    'ى': 'ي',
-    'ى': 'ا',
-    'ى': 'ه',
-    'ى': 'ة',
-    'ئ': 'ي',    
+    'ه':['ة', 'ا'], 
+    'ة': ['ه'],
+    'ا':['ه'],
+    'و' :['ؤ'],
+    'أ' :['ا', 'إ', 'ئ', 'ؤ', 'ء'], 
+    'إ':['ا', 'أ', 'ئ', 'ؤ', 'ء'],
+    'ؤ':['ء', 'ئ', 'و'],
+    'ئ':['ؤ', 'ء', 'ي'],
+    'ى': ['ي', 'ا', 'ه', 'ة'],
 }
 
 COST_FREQ2 = 0.5
 DICT_LETTER_SWAP_FREQ2 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ2 (0.5)
-    'ء' : '',
-    'ل' : 'م',
-    'م' : 'ل',
-    'ن' : 'ل',
-    'ل' : 'ن',
-    'ل' : 'ر',
-    'ر' : 'ل',
-    'م' : 'ن',
-    'ن' : 'م',
-    'ر' : 'م',
-    'م' : 'ر',
-    'ن' : 'ر',
-    'ر' : 'ن',
-    'ر' : 'ن',
-    'ذ' : 'ز',
-    'ز' : 'ذ',
-    'ظ' : 'ذ',
-    'ذ' : 'ظ',
-    'ز' : 'ظ',
-    'ظ' : 'ز',
-    'ظ' : 'ض',
-    'ض' : 'ظ',
-    'ض' : 'د',
-    'د' : 'ض',
+    'ء' : [''],
+    'ل' : ['م','ن', 'ر'],
+    'م' : ['ل', 'ن', 'م', 'ر'],
+    'ن' : ['ل', 'ر'],
+    'ر' : ['ل', 'م', 'ن'],
+    'ذ' : ['ز', 'ظ'],
+    'ظ' : ['ذ', 'ز', 'ض'],
+    'ز' : ['ظ', 'ذ'],
+    'ض' : ['ظ', 'د'],
+    'د' : ['ض'],
   
 
 }
@@ -85,15 +54,15 @@ def weighted_letter_swap(
     Returns:
         int: The cost of substituting letter_1 for letter_2.
     """
-    cost = def_substitution_cost
-    for dict_letter_swap, cost in list_dict_freq_costs:
-        if letter_1 in dict_letter_swap and dict_letter_swap[letter_1]==letter_2:
-            cost = cost
+    substitution_cost = def_substitution_cost
+    for dict_letter_swap, dict_cost in list_dict_freq_costs:
+        if letter_1 in dict_letter_swap and letter_2 in dict_letter_swap[letter_1]:
+            substitution_cost = dict_cost
             break
-        if letter_2 in dict_letter_swap and dict_letter_swap[letter_2]==letter_1:
-            cost = cost
+        elif letter_2 in dict_letter_swap and letter_1 in dict_letter_swap[letter_2]:
+            substitution_cost = dict_cost
             break 
-    return cost
+    return substitution_cost
 
 def weighted_edit_distance(
         string1, string2, insertion_cost=1, deletion_cost=1, def_substitution_cost=1, 
