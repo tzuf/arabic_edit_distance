@@ -5,7 +5,7 @@ This code calculates the weighted edit distance between two strings.
 import numpy as np
 
 PREFIX = [
-    'ال', 'ع','و','وال', 'لل', 'ل','ب', 'بال', 'عال', 'وع','ولل', 'ول', 'وب']
+    'ال', 'ع','و','وال', 'لل', 'ل','ب', 'بال', 'عال', 'وعال', 'وع','ولل', 'ول', 'وب']
 
 COST_FREQ1 = 0.1
 DICT_LETTER_SWAP_FREQ1 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ1 (0.1)
@@ -24,8 +24,8 @@ COST_FREQ2 = 0.5
 DICT_LETTER_SWAP_FREQ2 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ2 (0.5)
     'ء' : [''],
     'ل' : ['م','ن', 'ر'],
-    'م' : ['ل', 'ن', 'م', 'ر'],
-    'ن' : ['ل', 'ر'],
+    'م' : ['ل', 'ن', 'ر'],
+    'ن' : ['ل', 'م', 'ر'],
     'ر' : ['ل', 'م', 'ن'],
     'ذ' : ['ز', 'ظ'],
     'ظ' : ['ذ', 'ز', 'ض'],
