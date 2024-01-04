@@ -3,6 +3,9 @@ This code calculates the weighted edit distance between two strings.
 """
 
 import numpy as np
+from nltk.tokenize import word_tokenize
+from Levenshtein import distance as lev
+
 
 PREFIX = [
     'ال', 'ع','و','وال', 'لل', 'ل','ب', 'بال', 'عال', 'وعال', 'وع','ولل', 'ول', 'وب']
@@ -11,7 +14,7 @@ COST_FREQ1 = 0.1
 DICT_LETTER_SWAP_FREQ1 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ1 (0.1)
     'ه':['ة', 'ا'], 
     'ة': ['ه'],
-    'ا':['ه'],
+    'ا':['ه',''],
     'و' :['ؤ'],
     'أ' :['ا', 'إ', 'ئ', 'ؤ', 'ء'], 
     'إ':['ا', 'أ', 'ئ', 'ؤ', 'ء'],
@@ -48,7 +51,8 @@ class ArabicEditDistance():
             deletion_cost=1, 
             substitution_cost=1,
             list_dict_freq_costs=LIST_DICT_LETTER_SWAP_BY_FREQ,
-            ignore_prefix=False
+            ignore_prefix=False,
+            is_standard_edit_distance = False
             ):
         """
         Args:
@@ -65,6 +69,7 @@ class ArabicEditDistance():
         self.def_substitution_cost = substitution_cost
         self.list_dict_freq_costs = list_dict_freq_costs
         self.ignore_prefix = ignore_prefix
+        self.is_standard_edit_distance = is_standard_edit_distance
 
     def __weighted_letter_swap(
             self, letter_1, letter_2):
@@ -88,7 +93,26 @@ class ArabicEditDistance():
                 break 
         return substitution_cost
 
-    def get_edit_distance(
+    def get_edit_distance(self, pred_string, gt_string):
+        """
+        Calculates the weighted edit distance between two strings.
+
+        Args:
+            string1 (str): The first string.
+            string2 (str): The second string.
+        Returns:
+            float: The weighted edit distance between the two strings.
+            float: The normalized score.
+        """
+        if self.is_standard_edit_distance:
+            edit_distance = lev(pred_string, gt_string)
+            score = round((1-edit_distance/len(gt_string))*100)
+            return edit_distance, score
+
+        else:
+            return self._get_arabic_edit_distance(pred_string, gt_string)
+
+    def _get_arabic_edit_distance(
             self, string1, string2):
         """
         Calculates the weighted edit distance between two strings.
@@ -97,7 +121,8 @@ class ArabicEditDistance():
             string1 (str): The first string.
             string2 (str): The second string.
         Returns:
-            int: The weighted edit distance between the two strings.
+            float: The weighted edit distance between the two strings.
+            float: The normalized score.
         """
         min_weighted_distance = self.__weighted_edit_distance(
             string1=string1, 
@@ -124,8 +149,9 @@ class ArabicEditDistance():
                 
                 if weighted_distance<min_weighted_distance:
                     min_weighted_distance = weighted_distance
-      
-        return min_weighted_distance
+        
+        score = round((1-min_weighted_distance/len(string2))*100)
+        return min_weighted_distance, score
 
     def __weighted_edit_distance(
             self, string1, string2):
@@ -167,13 +193,35 @@ class ArabicEditDistance():
         return d[n, m]
 
 
+    def fuzzy_token_set_ratio(self, pred_string, gt_string):
+
+        gt_tokens = word_tokenize(gt_string)
+        pred_tokens = word_tokenize(pred_string)
+
+        total_score = 0
+        for gt_token in gt_tokens:
+            max_score = 0
+            for pred_token in pred_tokens:
+                _, score = self.get_edit_distance(pred_string=pred_token, gt_string=gt_token)
+                if max_score<score:
+                    max_score = score
+
+            total_score += max_score
+
+        return round(total_score/len(gt_tokens))
+
+
+
+
 if __name__ == "__main__":
-    string1 = "المؤسسة"
-    string2 = "عموسسة"
+    pred_string = "Juma"
+    gt_string = "House of the martyr Ibrahim Juma Mahmoud Al-Najjar"
      
-    edit_distance = ArabicEditDistance()
-    weighted_distance = edit_distance.get_edit_distance(string1, string2)
-    normalized_weighted_distance = weighted_distance/len(string2)
-    
-    print("Weighted edit distance:", weighted_distance)
-    print ("Normalized weighted edit distance:", normalized_weighted_distance)
+    edit_distance = ArabicEditDistance(is_standard_edit_distance=True)
+
+    print (edit_distance.fuzzy_token_set_ratio(pred_string=pred_string,gt_string=gt_string))
+
+    pred_string = "مسجد"
+    gt_string = "مسجد الدين الشهير"
+
+    print (edit_distance.fuzzy_token_set_ratio(pred_string=pred_string,gt_string=gt_string))
