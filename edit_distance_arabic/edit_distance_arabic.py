@@ -219,7 +219,7 @@ class ArabicEditDistance():
 
 if __name__ == "__main__":
     pred_string = "Juma"
-    gt_string = "House of the martyr Ibrahim Juma Mahmoud Al-Najjar"
+    gt_string = "House of Juma"
      
     edit_distance = ArabicEditDistance(is_standard_edit_distance=True)
 
