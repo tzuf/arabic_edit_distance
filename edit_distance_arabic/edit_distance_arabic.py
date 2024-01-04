@@ -21,7 +21,11 @@ DICT_LETTER_SWAP_FREQ1 = { # Dictionary of letter pairs with a substitution cost
     'ؤ':['ء', 'ئ', 'و'],
     'ئ':['ؤ', 'ء', 'ي'],
     'ى': ['ي', 'ا', 'ه', 'ة'],
+    'ث': ['ت'],
+    'ذ':['د']
+
 }
+
 
 COST_FREQ2 = 0.5
 DICT_LETTER_SWAP_FREQ2 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ2 (0.5)
