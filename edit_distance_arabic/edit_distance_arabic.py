@@ -10,6 +10,8 @@ from Levenshtein import distance as lev
 PREFIX = [
     'ال', 'ع','و','وال', 'لل', 'ل','ب', 'بال', 'عال', 'وعال', 'وع','ولل', 'ول', 'وب']
 
+DROPPED_LETTER = ['ا']
+
 COST_FREQ1 = 0.1
 DICT_LETTER_SWAP_FREQ1 = { # Dictionary of letter pairs with a substitution cost of COST_FREQ1 (0.1)
     'ه':['ة', 'ا'], 
@@ -87,6 +89,7 @@ class ArabicEditDistance():
         Returns:
             int: The cost of substituting letter_1 for letter_2.
         """
+
         substitution_cost = self.def_substitution_cost
         for dict_letter_swap, dict_cost in self.list_dict_freq_costs:
             if letter_1 in dict_letter_swap and letter_2 in dict_letter_swap[letter_1]:
@@ -183,8 +186,17 @@ class ArabicEditDistance():
             d[0, j] = self.def_insertion_cost * j
 
         for i in range(1, n + 1):
+            if  string1[i - 1] in DROPPED_LETTER and string2[j - 1]!=string1[i - 1]:
+                d[i, j] = min(d[i - 1, j] + self.def_deletion_cost,
+                            d[i, j - 1] + self.def_insertion_cost,
+                            d[i - 1, j - 1])
+                continue 
+
             for j in range(1, m + 1):
-                if string1[i - 1] == string2[j - 1]:
+
+                if  string2[j - 1] in DROPPED_LETTER and string1[i - 1]!=string2[j - 1]:
+                    substitution_cost = 0
+                elif string1[i - 1] == string2[j - 1]:
                     substitution_cost = 0
                 else:
                     substitution_cost = self.__weighted_letter_swap(
@@ -197,24 +209,31 @@ class ArabicEditDistance():
         return d[n, m]
 
 
-    def fuzzy_token_set_ratio(self, pred_string, gt_string):
+    def fuzzy_token_set_ratio(self, pred_string, gt_string, max_distance=np.inf):
 
         gt_tokens = word_tokenize(gt_string)
         pred_tokens = word_tokenize(pred_string)
 
         total_score = 0
+        idx_pred_found = [] 
         for gt_token in gt_tokens:
             max_score = 0
-            for pred_token in pred_tokens:
+            max_idx_pred = 0
+            for pred_idx, pred_token in enumerate(pred_tokens):
+                # Stop if the distance between tokens in the pred is to arge
+                if len(idx_pred_found)>0 and abs(pred_idx - idx_pred_found[-1])>=max_distance:
+                    break
                 _, score = self.get_edit_distance(pred_string=pred_token, gt_string=gt_token)
                 if max_score<score:
                     max_score = score
+                    max_idx_pred = pred_idx
+            
+            idx_pred_found.append(max_idx_pred)
+            
 
             total_score += max_score
 
         return round(total_score/len(gt_tokens))
-
-
 
 
 if __name__ == "__main__":
@@ -229,3 +248,9 @@ if __name__ == "__main__":
     gt_string = "مسجد الدين الشهير"
 
     print (edit_distance.fuzzy_token_set_ratio(pred_string=pred_string,gt_string=gt_string))
+
+    pred_string = "وسیقى الاجر والثواب لفي معهد العلم علم الحرام في مستلم مهم علم فقام واسه همنا مع بعضنه يقول فطر سعته تعالی فر در ماه های استان به بیت به مدارس مل رسول عله راه من ن الدهر الله عنه عند الامن بات منوعة"
+    gt_string = "الامن العام"
+    
+    print (string_matching.fuzzy_token_set_ratio(pred_string=pred_string,gt_string=gt_string, max_distance=4))
+
