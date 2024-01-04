@@ -222,7 +222,7 @@ class ArabicEditDistance():
             for pred_idx, pred_token in enumerate(pred_tokens):
                 # Stop if the distance between tokens in the pred is to arge
                 if len(idx_pred_found)>0 and abs(pred_idx - idx_pred_found[-1])>=max_distance:
-                    break
+                    continue
                 _, score = self.get_edit_distance(pred_string=pred_token, gt_string=gt_token)
                 if max_score<score:
                     max_score = score
@@ -234,7 +234,6 @@ class ArabicEditDistance():
             total_score += max_score
 
         return round(total_score/len(gt_tokens))
-
 
 if __name__ == "__main__":
     pred_string = "Juma"
